@@ -26,7 +26,7 @@ func encodeRuneUTF8(c rune) string {
 	return string(arr[:utf8.EncodeRune(arr, c)])
 }
 
-// sfClipboard is the wrapper for sf.Clipboard*, satsifying imgui.Clipboard
+// sfClipboard is the wrapper for sf.Clipboard*, satisfying imgui.Clipboard
 type sfClipboard struct{}
 
 func (*sfClipboard) Text() (string, error) {
@@ -212,7 +212,7 @@ func FontTexture() *sf.Texture {
 	return fontTexture
 }
 
-// ImageTextureV calls imgui.ImageV, with the paramaters filled in as expected
+// ImageTextureV calls imgui.ImageV, with the parameters filled in as expected
 func ImageTextureV(texture *sf.Texture, size sf.Vector2f, textureRect sf.IntRect, tintColor, borderColor sf.Color) {
 	tSize := texture.GetSize()
 
@@ -242,7 +242,7 @@ func Image(sprite *sf.Sprite, tintColor, borderColor sf.Color) {
 	ImageTextureV(t, sf.Vector2f{X: float32(ts.X) * s.X, Y: float32(ts.Y) * s.Y}, sprite.GetTextureRect(), tintColor, borderColor)
 }
 
-// ImageButtonTextureV calls imgui.ImageButtonV, with the paramaters filled in as expected
+// ImageButtonTextureV calls imgui.ImageButtonV, with the parameters filled in as expected
 func ImageButtonTextureV(texture *sf.Texture, size sf.Vector2f, textureRect sf.IntRect, framePadding int, bgColor, tintColor sf.Color) bool {
 	tSize := texture.GetSize()
 
