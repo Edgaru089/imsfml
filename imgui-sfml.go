@@ -18,6 +18,9 @@ var (
 	mousePressed [3]bool
 	mouseHidden  bool
 
+	cursors       [imgui.MouseCursorCount]*sf.Cursor
+	currentCursor int
+
 	fontTexture *sf.Texture
 )
 
@@ -53,7 +56,8 @@ func Init(displaySize imgui.Vec2, winHasFocus bool, createDefaultFont bool) (err
 
 	mIO := imgui.CurrentIO()
 
-	// It seems there are no flags to be set?
+	// Set backend flags
+	mIO.SetBackendFlags(imgui.BackendFlagHasMouseCursors)
 
 	// Init keymaps
 	mIO.KeyMap(imgui.KeyTab, sf.KeyTab)
@@ -77,6 +81,17 @@ func Init(displaySize imgui.Vec2, winHasFocus bool, createDefaultFont bool) (err
 	mIO.KeyMap(imgui.KeyX, sf.KeyX)
 	mIO.KeyMap(imgui.KeyY, sf.KeyY)
 	mIO.KeyMap(imgui.KeyZ, sf.KeyZ)
+
+	// Load cursors
+	cursors[imgui.MouseCursorArrow] = sf.NewCursorFromSystem(sf.CursorArrow)
+	cursors[imgui.MouseCursorTextInput] = sf.NewCursorFromSystem(sf.CursorText)
+	cursors[imgui.MouseCursorResizeAll] = sf.NewCursorFromSystem(sf.CursorSizeAll)
+	cursors[imgui.MouseCursorResizeNS] = sf.NewCursorFromSystem(sf.CursorSizeVertical)
+	cursors[imgui.MouseCursorResizeEW] = sf.NewCursorFromSystem(sf.CursorSizeHorizontal)
+	cursors[imgui.MouseCursorResizeNESW] = sf.NewCursorFromSystem(sf.CursorSizeBottomLeftTopRight)
+	cursors[imgui.MouseCursorResizeNWSE] = sf.NewCursorFromSystem(sf.CursorSizeTopLeftBottomRight)
+	cursors[imgui.MouseCursorHand] = sf.NewCursorFromSystem(sf.CursorHand)
+	currentCursor = imgui.MouseCursorArrow
 
 	// Set display size
 	mIO.SetDisplaySize(displaySize)
@@ -141,20 +156,25 @@ func ProcessEvent(e sf.Event) {
 	}
 }
 
-// UpdateRenderWindow calls Update(sf.Mouse.GetPosition(win), win.GetSize(), deltaT)
+// UpdateRenderWindow calls Update(sf.Mouse.GetPosition(win), win.GetSize(), deltaT). It
+// also updates the mouse cursor, which Update() does not.
 // Call it before every frame.
 func UpdateRenderWindow(win *sf.RenderWindow, deltaT time.Duration) {
+
+	// Update mouse cursor
+	if currentCursor != imgui.MouseCursor() {
+		currentCursor = imgui.MouseCursor()
+		if currentCursor == imgui.MouseCursorNone {
+			win.SetMouseCursorVisible(false)
+		} else {
+			win.SetMouseCursorVisible(true)
+			win.SetMouseCursor(cursors[currentCursor])
+		}
+	}
+
 	pos := sf.MouseGetPosition(win)
 	size := win.GetSize()
 	Update(imgui.Vec2{X: float32(pos.X), Y: float32(pos.Y)}, imgui.Vec2{X: float32(size.X), Y: float32(size.Y)}, deltaT)
-}
-
-// converts bool to int
-func boolToInt(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }
 
 // Update updates the initial state, calling imgui.NewFrame.
